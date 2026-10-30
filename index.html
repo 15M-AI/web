@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>15M - 100% Open Source Artificial Intelligence</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Silkscreen for pixel aesthetics and Inter for modern readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pixel: {
+                            yellow: '#FFD000',
+                            orange: '#FF5500',
+                            red: '#E60026',
+                            darkBg: '#0b0c10',
+                            darkCard: '#13151d',
+                            darkBorder: '#232734',
+                            lightBg: '#f8f9fc',
+                            lightCard: '#ffffff',
+                            lightBorder: '#e2e8f0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        pixel: ['Silkscreen', 'cursive'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Pixel Aesthetics & Responsive Canvas Styles */
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .pixel-corners {
+            clip-path: polygon(
+                0 4px, 4px 4px, 4px 0,
+                calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px,
+                100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%,
+                4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px)
+            );
+        }
+
+        .pixel-btn {
+            position: relative;
+            box-shadow: 0 4px 0 #000;
+            transition: all 0.1s ease;
+        }
+
+        .pixel-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #000;
+        }
+
+        .pixel-gradient-text {
+            background: linear-gradient(90deg, #FFD000 0%, #FF5500 50%, #E60026 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pixel-gradient-border {
+            border-image: linear-gradient(90deg, #FFD000, #FF5500, #E60026) 1;
+        }
+
+        .pixel-gradient-bg {
+            background: linear-gradient(135deg, #FFD000 0%, #FF5500 50%, #E60026 100%);
+        }
+
+        /* Subtle pixel grid texture background overlay */
+        .pixel-grid-pattern {
+            background-size: 24px 24px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 85, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 85, 0, 0.05) 1px, transparent 1px);
+        }
+
+        /* Dark mode matrix grid background */
+        .dark .pixel-grid-pattern {
+            background-image: 
+                linear-gradient(to right, rgba(255, 208, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 208, 0, 0.03) 1px, transparent 1px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF5500;
+            border-radius: 0px;
+        }
+
+        /* Scanline effect for terminal UI */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+        }
+    </style>
+</head>
+
+<body class="bg-pixel-lightBg text-slate-800 dark:bg-pixel-darkBg dark:text-slate-100 font-sans antialiased min-h-screen selection:bg-pixel-orange selection:text-white">
+
+    <!-- Pixel Canvas Dynamic Background -->
+    <canvas id="pixelCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40 dark:opacity-30"></canvas>
+
+    <div class="relative z-10 flex flex-col min-h-screen">
+
+        <!-- HEADER / NAVIGATION BAR -->
+        <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-pixel-darkBg/80 border-b border-pixel-lightBorder dark:border-pixel-darkBorder transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-20">
+                    
+                    <!-- BRAND LOGO 15M using logo.png -->
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="relative p-1 bg-white dark:bg-slate-900 border-2 border-pixel-orange/40 rounded-sm pixel-corners shadow-md group-hover:scale-105 transition-all flex items-center justify-center overflow-hidden">
+                            <img src="logo.png" alt="15M Logo" class="h-8 w-auto object-contain block dark:brightness-105" onerror="this.onerror=null; this.src='https://placehold.co/120x40/FF5500/ffffff?text=15M';">
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-pixel text-2xl tracking-wider pixel-gradient-text font-bold">15M</span>
+                            <span class="text-[10px] font-mono tracking-widest text-slate-500 dark:text-slate-400 uppercase -mt-1">Open Source AI</span>
+                        </div>
+                    </a>
+
+                    <!-- DESKTOP NAV LINKS -->
+                    <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                        <a href="#pico" class="hover:text-pixel-orange transition-colors">Pico Model</a>
+                        <a href="#cli" class="hover:text-pixel-orange transition-colors">CLI Setup</a>
+                        <a href="#roadmap" class="hover:text-pixel-orange transition-colors">Roadmap</a>
+                        <a href="#philosophy" class="hover:text-pixel-orange transition-colors">Philosophy</a>
+                        <a href="#community" class="hover:text-pixel-orange transition-colors">Community</a>
+                    </nav>
+
+                    <!-- HEADER RIGHT UTILITIES -->
+                    <div class="flex items-center space-x-4">
+                        
+                        <!-- THEME TOGGLE SWITCH -->
+                        <button id="themeToggleBtn" aria-label="Toggle Theme" class="p-2.5 rounded-lg border border-pixel-lightBorder dark:border-pixel-darkBorder bg-slate-100 dark:bg-pixel-darkCard text-slate-700 dark:text-slate-200 hover:border-pixel-orange transition-all flex items-center gap-2">
+                            <i id="themeIconSun" class="fa-solid fa-sun text-pixel-yellow hidden"></i>
+                            <i id="themeIconMoon" class="fa-solid fa-moon text-pixel-orange hidden"></i>
+                            <span id="themeLabel" class="text-xs font-mono hidden sm:inline-block">Auto</span>
+                        </button>
+
+                        <!-- GITHUB LINK BUTTON -->
+                        <a href="https://github.com/15M-AI/" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-pixel font-bold text-white pixel-gradient-bg pixel-corners pixel-btn hover:opacity-90">
+                            <i class="fa-brands fa-github text-sm"></i>
+                            <span>GITHUB</span>
+                        </a>
+
+                        <!-- MOBILE MENU BUTTON -->
+                        <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-600 dark:text-slate-300">
+                            <i class="fa-solid fa-bars text-xl"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MOBILE MENU DROPDOWN -->
+            <div id="mobileMenu" class="hidden md:hidden border-b border-pixel-lightBorder dark:border-pixel-darkBorder bg-white/95 dark:bg-pixel-darkCard/95 px-4 pt-2 pb-6 space-y-3 font-medium">
+                <a href="#pico" class="block py-2 hover:text-pixel-orange">Pico Model</a>
+                <a href="#cli" class="block py-2 hover:text-pixel-orange">CLI Setup</a>
+                <a href="#roadmap" class="block py-2 hover:text-pixel-orange">Roadmap</a>
+                <a href="#philosophy" class="block py-2 hover:text-pixel-orange">Philosophy</a>
+                <a href="#community" class="block py-2 hover:text-pixel-orange">Community</a>
+                <a href="https://github.com/15M-AI/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-pixel text-white pixel-gradient-bg pixel-corners w-full justify-center">
+                    <i class="fa-brands fa-github"></i> GITHUB 15M
+                </a>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT CONTAINER -->
+        <main class="flex-grow pixel-grid-pattern">
+
+            <!-- HERO SECTION -->
+            <section class="relative pt-12 pb-20 md:pt-24 md:pb-32 overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    
+                    <!-- BADGE -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-pixel-orange/40 bg-pixel-orange/10 text-pixel-orange text-xs font-mono font-semibold mb-8">
+                        <span class="w-2 h-2 rounded-full bg-pixel-orange animate-ping"></span>
+                        <span class="font-pixel text-[11px] text-pixel-yellow">IN DEVELOPMENT</span>
+                        <span class="text-slate-400">|</span>
+                        100% OPEN SOURCE AI MODEL
+                    </div>
+
+                    <!-- MAIN HEADLINE -->
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight mb-6">
+                        Building Next-Gen AI <br class="hidden sm:block"/>
+                        <span class="pixel-gradient-text font-pixel font-bold">100% Open Source</span>
+                    </h1>
+
+                    <!-- SUBTITLE -->
+                    <p class="max-w-3xl mx-auto text-lg sm:text-xl text-slate-600 dark:text-slate-300 font-normal mb-10 leading-relaxed">
+                        At <span class="font-bold font-pixel text-pixel-orange">15M</span>, we are developing <span class="font-pixel text-pixel-yellow bg-slate-900 px-2 py-0.5 rounded">Pico</span>, our lightweight and highly efficient AI model. Complete transparency, open source code, and zero commercial restrictions.
+                    </p>
+
+                    <!-- CALL TO ACTION BUTTONS -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+                        <a href="https://github.com/15M-AI/" target="_blank" class="w-full sm:w-auto px-8 py-4 text-sm font-pixel font-bold text-white pixel-gradient-bg pixel-corners pixel-btn flex items-center justify-center gap-3">
+                            <i class="fa-brands fa-github text-base"></i>
+                            <span>GITHUB ORG</span>
+                        </a>
+                        <a href="https://huggingface.co/15MAI" target="_blank" class="w-full sm:w-auto px-8 py-4 text-sm font-mono font-semibold text-slate-800 dark:text-white bg-slate-200/80 dark:bg-pixel-darkCard border border-slate-300 dark:border-pixel-darkBorder pixel-corners hover:border-pixel-orange transition-colors flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-face-smile text-pixel-yellow"></i>
+                            <span>HUGGING FACE</span>
+                        </a>
+                    </div>
+
+                    <!-- STATUS BADGES BAR -->
+                    <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-pixel-lightBorder dark:border-pixel-darkBorder/60">
+                        <div class="p-4">
+                            <div class="font-pixel text-xl sm:text-2xl text-pixel-yellow">100% Free</div>
+                            <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">Apache 2.0 License</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="font-pixel text-xl sm:text-2xl text-pixel-orange">In Development</div>
+                            <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">Pico Model</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="font-pixel text-xl sm:text-2xl text-pixel-red">Transparent</div>
+                            <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">Weights & Datasets</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="font-pixel text-xl sm:text-2xl text-slate-800 dark:text-white">Community</div>
+                            <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">First Policy</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- MODEL PICO SECTION -->
+            <section id="pico" class="py-20 border-t border-pixel-lightBorder dark:border-pixel-darkBorder/80 bg-slate-50/50 dark:bg-pixel-darkBg/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                        <div>
+                            <div class="text-xs font-pixel text-pixel-orange mb-2">[ FLAGSHIP MODEL ]</div>
+                            <h2 class="text-3xl sm:text-4xl font-bold flex items-center gap-3">
+                                Pico Model 
+                                <span class="text-xs font-pixel px-3 py-1 bg-pixel-yellow/20 text-yellow-800 dark:text-pixel-yellow border border-pixel-yellow/40 rounded">IN DEVELOPMENT</span>
+                            </h2>
+                        </div>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm max-w-md mt-2 md:mt-0 font-mono">
+                            Designed to run efficiently on consumer hardware and edge servers.
+                        </p>
+                    </div>
+
+                    <!-- FEATURE CARD PICO -->
+                    <div class="bg-white dark:bg-pixel-darkCard border-2 border-slate-200 dark:border-pixel-darkBorder p-8 pixel-corners hover:border-pixel-orange dark:hover:border-pixel-orange transition-all relative overflow-hidden">
+                        
+                        <div class="absolute top-0 right-0 p-4">
+                            <span class="px-3 py-1 text-xs font-mono font-bold bg-pixel-orange/20 text-pixel-orange border border-pixel-orange/30">Upcoming Release</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <div class="inline-block p-3 bg-pixel-orange/10 text-pixel-orange font-pixel text-2xl mb-4 pixel-corners">
+                                    <i class="fa-solid fa-microchip"></i> 15M-Pico
+                                </div>
+                                <h3 class="text-2xl font-pixel text-slate-900 dark:text-white mb-4">Extreme Efficiency & Open Source</h3>
+                                <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
+                                    Pico is 15M's commitment to ultralight, accessible artificial intelligence. Built from scratch to deliver high-tier performance with minimal resource consumption.
+                                </p>
+
+                                <div class="grid grid-cols-2 gap-4 text-xs font-mono mb-6">
+                                    <div class="p-3 bg-slate-100 dark:bg-slate-900/80 rounded border border-slate-200 dark:border-slate-800">
+                                        <div class="text-slate-400 mb-1">Architecture</div>
+                                        <div class="font-bold text-slate-800 dark:text-slate-200">Optimized Transformer</div>
+                                    </div>
+                                    <div class="p-3 bg-slate-100 dark:bg-slate-900/80 rounded border border-slate-200 dark:border-slate-800">
+                                        <div class="text-slate-400 mb-1">License</div>
+                                        <div class="font-bold text-emerald-500">Apache 2.0 (100% Open)</div>
+                                    </div>
+                                    <div class="p-3 bg-slate-100 dark:bg-slate-900/80 rounded border border-slate-200 dark:border-slate-800">
+                                        <div class="text-slate-400 mb-1">Focus</div>
+                                        <div class="font-bold text-slate-800 dark:text-slate-200">Local & Edge Inference</div>
+                                    </div>
+                                    <div class="p-3 bg-slate-100 dark:bg-slate-900/80 rounded border border-slate-200 dark:border-slate-800">
+                                        <div class="text-slate-400 mb-1">Status</div>
+                                        <div class="font-bold text-pixel-yellow">Training Phase</div>
+                                    </div>
+                                </div>
+
+                                <a href="https://huggingface.co/15MAI" target="_blank" class="p-4 bg-slate-900 hover:bg-slate-800 transition-colors text-slate-300 font-mono text-xs rounded border border-slate-800 flex items-center justify-between group">
+                                    <span class="text-pixel-yellow">huggingface.co/15MAI</span>
+                                    <span class="text-pixel-orange text-[10px] uppercase font-bold group-hover:translate-x-1 transition-transform">Official Profile &rarr;</span>
+                                </a>
+                            </div>
+
+                            <!-- TRAINING PROGRESS VISUAL -->
+                            <div class="bg-slate-900 p-6 rounded border border-slate-800 font-mono text-xs text-slate-300 space-y-4">
+                                <div class="text-pixel-yellow font-bold border-b border-slate-800 pb-2">
+                                    &gt; PICO_TRAINING_STATUS.log
+                                </div>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-[11px] mb-1">
+                                            <span>Dataset Pre-training & Filtering</span>
+                                            <span class="text-emerald-400">100% Complete</span>
+                                        </div>
+                                        <div class="w-full bg-slate-800 h-2 rounded"><div class="bg-emerald-500 h-2 rounded" style="width: 100%"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[11px] mb-1">
+                                            <span>Base Model Pre-training</span>
+                                            <span class="text-pixel-yellow">In Progress</span>
+                                        </div>
+                                        <div class="w-full bg-slate-800 h-2 rounded"><div class="bg-pixel-yellow h-2 rounded" style="width: 68%"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[11px] mb-1">
+                                            <span>Fine-tuning & Open Alignment</span>
+                                            <span class="text-slate-500">Upcoming</span>
+                                        </div>
+                                        <div class="w-full bg-slate-800 h-2 rounded"><div class="bg-pixel-orange h-2 rounded" style="width: 15%"></div></div>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">
+                                    Intermediate checkpoints will be shared publicly with the community upon pre-training completion.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- TERMINAL CLI / CODE PREVIEW SECTION -->
+            <section id="cli" class="py-20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <div class="text-center max-w-3xl mx-auto mb-12">
+                        <div class="text-xs font-pixel text-pixel-orange mb-2">[ COMMAND LINE INTERFACE ]</div>
+                        <h2 class="text-3xl sm:text-4xl font-bold">Setup & Code Integration</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-2 font-mono">
+                            Official snippets for cloning and using 15M repositories.
+                        </p>
+                    </div>
+
+                    <!-- TERMINAL CLI CONTAINER -->
+                    <div class="max-w-4xl mx-auto bg-slate-950 text-slate-200 rounded-none border-4 border-slate-800 shadow-2xl overflow-hidden pixel-corners scanlines">
+                        
+                        <!-- TERMINAL HEADER -->
+                        <div class="bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between font-mono text-xs text-slate-400">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 bg-red-500 rounded-full inline-block"></span>
+                                <span class="w-3 h-3 bg-yellow-500 rounded-full inline-block"></span>
+                                <span class="w-3 h-3 bg-green-500 rounded-full inline-block"></span>
+                                <span class="ml-2 text-slate-300 font-bold">bash - 15m-cli</span>
+                            </div>
+                            <span class="text-pixel-yellow text-[10px] font-bold">[100% OPEN SOURCE]</span>
+                        </div>
+
+                        <!-- TERMINAL CODE CONTENT -->
+                        <div class="p-6 font-mono text-xs sm:text-sm space-y-6">
+                            
+                            <div>
+                                <div class="text-slate-500 mb-1"># 1. Clone the official repository from GitHub</div>
+                                <div class="flex items-center justify-between bg-slate-900 p-3 rounded border border-slate-800">
+                                    <code class="text-pixel-yellow">git clone https://github.com/15M-AI/pico.git</code>
+                                    <button onclick="copyToClipboard('git clone https://github.com/15M-AI/pico.git')" class="text-slate-400 hover:text-white px-2 py-1 text-xs bg-slate-800 rounded">
+                                        <i class="fa-regular fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="text-slate-500 mb-1"># 2. Load model weights directly via Hugging Face Transformers</div>
+                                <div class="bg-slate-900 p-4 rounded border border-slate-800 text-slate-300 overflow-x-auto">
+<pre class="font-mono text-xs"><span class="text-pixel-orange">from</span> transformers <span class="text-pixel-orange">import</span> AutoModelForCausalLM, AutoTokenizer
+
+<span class="text-slate-500"># Load tokenizer & weights from Hugging Face</span>
+tokenizer = AutoTokenizer.from_pretrained(<span class="text-emerald-400">"15MAI/pico"</span>)
+model = AutoModelForCausalLM.from_pretrained(<span class="text-emerald-400">"15MAI/pico"</span>)
+
+inputs = tokenizer(<span class="text-emerald-400">"Hello Pico, generate a response"</span>, return_tensors=<span class="text-emerald-400">"pt"</span>)
+outputs = model.generate(**inputs, max_new_tokens=100)
+print(tokenizer.decode(outputs[0]))</pre>
+                                </div>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+                                <span><i class="fa-solid fa-code-branch text-pixel-orange"></i> License: Apache 2.0</span>
+                                <a href="https://github.com/15M-AI/" target="_blank" class="text-pixel-yellow hover:underline flex items-center gap-1">
+                                    <span>Visit 15M GitHub</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ROADMAP SECTION -->
+            <section id="roadmap" class="py-20 border-t border-pixel-lightBorder dark:border-pixel-darkBorder bg-slate-50/50 dark:bg-pixel-darkBg/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <div class="text-xs font-pixel text-pixel-orange mb-2">[ ROADMAP ]</div>
+                        <h2 class="text-3xl sm:text-4xl font-bold">15M Development Roadmap</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-2 font-mono">
+                            Clear milestones towards the public release of Pico.
+                        </p>
+                    </div>
+
+                    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- STEP 1 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border-2 border-pixel-orange/40 pixel-corners relative">
+                            <div class="text-xs font-mono font-bold text-emerald-500 mb-2">[ PHASE 1 - COMPLETED ]</div>
+                            <h3 class="font-pixel text-lg mb-2">Architecture & Datasets</h3>
+                            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                                Architecture design for Pico and dataset filtering without copyright restrictions.
+                            </p>
+                        </div>
+
+                        <!-- STEP 2 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border-2 border-pixel-yellow pixel-corners relative">
+                            <div class="text-xs font-mono font-bold text-pixel-yellow mb-2">[ PHASE 2 - IN PROGRESS ]</div>
+                            <h3 class="font-pixel text-lg mb-2">Base Pre-training</h3>
+                            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                                Training clusters executing base model weights. Regular progress updates published.
+                            </p>
+                        </div>
+
+                        <!-- STEP 3 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border-2 border-slate-200 dark:border-pixel-darkBorder pixel-corners relative">
+                            <div class="text-xs font-mono font-bold text-slate-400 mb-2">[ PHASE 3 - UPCOMING ]</div>
+                            <h3 class="font-pixel text-lg mb-2">Public Release</h3>
+                            <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
+                                Complete release of final Pico weights on Hugging Face and GitHub under Apache 2.0 license.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- OPEN SOURCE VALUES / PHILOSOPHY -->
+            <section id="philosophy" class="py-20 border-t border-pixel-lightBorder dark:border-pixel-darkBorder">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    
+                    <div class="text-center max-w-3xl mx-auto mb-16">
+                        <div class="text-xs font-pixel text-pixel-orange mb-2">[ CORE VALUES ]</div>
+                        <h2 class="text-3xl sm:text-4xl font-bold">Our Open Source Philosophy</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 font-mono">
+                            Radical transparency across every line of code and model parameter.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        
+                        <!-- CARD 1 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-yellow transition-all">
+                            <div class="w-12 h-12 pixel-gradient-bg pixel-corners flex items-center justify-center text-white mb-6 text-xl">
+                                <i class="fa-solid fa-unlock"></i>
+                            </div>
+                            <h3 class="font-pixel text-lg mb-3">100% Open Weights</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Complete model checkpoints released for free download and self-hosted execution.
+                            </p>
+                        </div>
+
+                        <!-- CARD 2 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-orange transition-all">
+                            <div class="w-12 h-12 pixel-gradient-bg pixel-corners flex items-center justify-center text-white mb-6 text-xl">
+                                <i class="fa-solid fa-database"></i>
+                            </div>
+                            <h3 class="font-pixel text-lg mb-3">Reproducibility</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Public documentation covering data pipelines, filtering logic, and training runs.
+                            </p>
+                        </div>
+
+                        <!-- CARD 3 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-red transition-all">
+                            <div class="w-12 h-12 pixel-gradient-bg pixel-corners flex items-center justify-center text-white mb-6 text-xl">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <h3 class="font-pixel text-lg mb-3">No Vendor Lock-in</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Full sovereignty for developers and enterprises without restrictive usage tiers.
+                            </p>
+                        </div>
+
+                        <!-- CARD 4 -->
+                        <div class="bg-white dark:bg-pixel-darkCard p-6 border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-yellow transition-all">
+                            <div class="w-12 h-12 pixel-gradient-bg pixel-corners flex items-center justify-center text-white mb-6 text-xl">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <h3 class="font-pixel text-lg mb-3">Community First</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                Fostering open collaboration to make state-of-the-art AI accessible to everyone.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- COMMUNITY & NEWSLETTER SECTION -->
+            <section id="community" class="py-20 border-t border-pixel-lightBorder dark:border-pixel-darkBorder bg-slate-50/50 dark:bg-pixel-darkBg/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    
+                    <div class="max-w-3xl mx-auto mb-12">
+                        <div class="text-xs font-pixel text-pixel-orange mb-2">[ GET NOTIFIED ]</div>
+                        <h2 class="text-3xl sm:text-4xl font-bold">Join the 15M Community</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-3 font-mono">
+                            Stay updated on Pico's training milestones and connect on our official channels.
+                        </p>
+                    </div>
+
+                    <!-- PRE-LAUNCH SUBSCRIPTION FORM -->
+                    <div class="max-w-md mx-auto mb-12 bg-white dark:bg-pixel-darkCard p-6 border-2 border-pixel-orange/30 pixel-corners">
+                        <form id="notifyForm" class="flex flex-col sm:flex-row gap-3">
+                            <input type="email" placeholder="Enter your email..." required class="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm font-mono focus:outline-none focus:border-pixel-orange">
+                            <button type="submit" class="px-6 py-3 font-pixel text-xs text-white pixel-gradient-bg pixel-corners pixel-btn whitespace-nowrap">NOTIFY ME</button>
+                        </form>
+                        <p id="notifySuccess" class="hidden text-xs text-emerald-500 font-mono mt-3">Thanks! We will notify you as soon as Pico is released.</p>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-6">
+                        
+                        <!-- GITHUB -->
+                        <a href="https://github.com/15M-AI/" target="_blank" class="flex items-center gap-4 px-6 py-4 bg-white dark:bg-pixel-darkCard border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-orange transition-all group w-full sm:w-auto">
+                            <i class="fa-brands fa-github text-2xl text-slate-800 dark:text-white"></i>
+                            <div class="text-left">
+                                <div class="font-pixel text-sm">GitHub Org</div>
+                                <div class="text-xs font-mono text-slate-500">github.com/15M-AI</div>
+                            </div>
+                        </a>
+
+                        <!-- HUGGING FACE -->
+                        <a href="https://huggingface.co/15MAI" target="_blank" class="flex items-center gap-4 px-6 py-4 bg-white dark:bg-pixel-darkCard border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-orange transition-all group w-full sm:w-auto">
+                            <i class="fa-solid fa-face-smile text-2xl text-pixel-yellow"></i>
+                            <div class="text-left">
+                                <div class="font-pixel text-sm">Hugging Face</div>
+                                <div class="text-xs font-mono text-slate-500">huggingface.co/15MAI</div>
+                            </div>
+                        </a>
+
+                        <!-- DISCORD -->
+                        <a href="https://discord.gg/AezjdgyE7" target="_blank" class="flex items-center gap-4 px-6 py-4 bg-white dark:bg-pixel-darkCard border border-pixel-lightBorder dark:border-pixel-darkBorder pixel-corners hover:border-pixel-orange transition-all group w-full sm:w-auto">
+                            <i class="fa-brands fa-discord text-2xl text-[#5865F2]"></i>
+                            <div class="text-left">
+                                <div class="font-pixel text-sm">Discord Server</div>
+                                <div class="text-xs font-mono text-slate-500">discord.gg/AezjdgyE7</div>
+                            </div>
+                        </a>
+
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="bg-white dark:bg-pixel-darkCard border-t border-pixel-lightBorder dark:border-pixel-darkBorder py-12 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    
+                    <!-- BRAND -->
+                    <div class="flex items-center gap-3">
+                        <div class="p-1 bg-white dark:bg-slate-900 border border-pixel-orange/40 rounded-sm">
+                            <img src="logo.png" alt="15M Logo" class="h-6 w-auto object-contain block" onerror="this.onerror=null; this.src='https://placehold.co/100x30/FF5500/ffffff?text=15M';">
+                        </div>
+                        <span class="font-pixel text-lg pixel-gradient-text font-bold">15M</span>
+                        <span class="text-xs font-mono text-slate-500">| 100% Open Source AI</span>
+                    </div>
+
+                    <!-- FOOTER LINKS -->
+                    <div class="flex flex-wrap items-center gap-6 text-xs font-mono text-slate-500 dark:text-slate-400">
+                        <a href="#pico" class="hover:text-pixel-orange">Pico Model</a>
+                        <a href="#cli" class="hover:text-pixel-orange">CLI Setup</a>
+                        <a href="#roadmap" class="hover:text-pixel-orange">Roadmap</a>
+                        <a href="#philosophy" class="hover:text-pixel-orange">Philosophy</a>
+                        <a href="https://github.com/15M-AI/" target="_blank" class="hover:text-pixel-orange">GitHub</a>
+                        <a href="https://huggingface.co/15MAI" target="_blank" class="hover:text-pixel-orange">Hugging Face</a>
+                        <a href="https://discord.gg/AezjdgyE7" target="_blank" class="hover:text-pixel-orange">Discord</a>
+                    </div>
+
+                    <!-- COPYRIGHT -->
+                    <div class="text-xs font-mono text-slate-500 dark:text-slate-400">
+                        © 2026 15M AI. Open source & transparent.
+                    </div>
+
+                </div>
+
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC & INTERACTIVITY -->
+    <script>
+        // -----------------------------------------------------------------
+        // AUTOMATIC DARK / LIGHT MODE DETECTION WITH MANUAL OVERRIDE
+        // -----------------------------------------------------------------
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIconSun = document.getElementById('themeIconSun');
+        const themeIconMoon = document.getElementById('themeIconMoon');
+        const themeLabel = document.getElementById('themeLabel');
+
+        function getPreferredTheme() {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+                return storedTheme;
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function applyTheme(theme, isExplicit = false) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeIconSun.classList.remove('hidden');
+                themeIconMoon.classList.add('hidden');
+                themeLabel.textContent = isExplicit ? 'Dark' : 'Auto';
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIconSun.classList.add('hidden');
+                themeIconMoon.classList.remove('hidden');
+                themeLabel.textContent = isExplicit ? 'Light' : 'Auto';
+            }
+            if (isExplicit) {
+                localStorage.setItem('theme', theme);
+            }
+        }
+
+        applyTheme(getPreferredTheme(), localStorage.getItem('theme') !== null);
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                applyTheme(e.matches ? 'dark' : 'light', false);
+            }
+        });
+
+        themeToggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            const newTheme = isDark ? 'light' : 'dark';
+            applyTheme(newTheme, true);
+        });
+
+        // Mobile Menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // Pixel canvas particle animation
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        let pixels = [];
+        const colors = ['#FFD000', '#FF5500', '#E60026'];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initPixels();
+        }
+
+        function initPixels() {
+            pixels = [];
+            const count = Math.floor((canvas.width * canvas.height) / 15000);
+            for (let i = 0; i < count; i++) {
+                pixels.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.floor(Math.random() * 4 + 2) * 2,
+                    speedY: Math.random() * 0.5 + 0.1,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    opacity: Math.random() * 0.5 + 0.2
+                });
+            }
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pixels.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.opacity;
+                ctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+                p.y -= p.speedY;
+                if (p.y < -10) {
+                    p.y = canvas.height + 10;
+                    p.x = Math.random() * canvas.width;
+                }
+            });
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        animateCanvas();
+
+        // Clipboard Copy Helper
+        function copyToClipboard(text) {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            
+            const copyBtn = event.currentTarget;
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Pre-launch notification form handler
+        document.getElementById('notifyForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.getElementById('notifySuccess').classList.remove('hidden');
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
